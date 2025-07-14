@@ -2,7 +2,7 @@ use gtk::prelude::*;
 use gtk::{glib, Application, ApplicationWindow, Button};
 
 fn main() -> glib::ExitCode {
-    let application = Application::builder()
+    let application = adw::Application::builder()
         .application_id("com.example.FirstGtkApp")
         .build();
 

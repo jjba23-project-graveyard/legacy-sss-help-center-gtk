@@ -47,6 +47,7 @@
             rust-analyzer
             clippy
             gtk4
+            libadwaita
           ];
 
           env = {
