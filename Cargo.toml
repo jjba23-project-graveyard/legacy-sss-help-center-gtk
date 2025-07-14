@@ -29,6 +29,7 @@ keywords = []
 categories = []
 
 [dependencies]
+gtk = { version = "0.9.7", package = "gtk4", features = ["v4_18"] }
 log = "0.4"
 
 [profile.release]

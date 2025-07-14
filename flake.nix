@@ -46,6 +46,7 @@
             cargo-watch
             rust-analyzer
             clippy
+            gtk4
           ];
 
           env = {
