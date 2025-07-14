@@ -48,6 +48,7 @@
             clippy
             gtk4
             libadwaita
+            ibm-plex # optional, personal font preference
           ];
 
           env = {
