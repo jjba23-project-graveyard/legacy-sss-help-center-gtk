@@ -1,0 +1,36 @@
+# sss-help
+
+# Copyright © Josep Bigorra <jjbigorra@gmail.com>
+
+# sss-help is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# sss-help is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with sss-help.  If not, see <https://www.gnu.org/licenses/>.
+
+[package]
+name = "sss-help"
+version = "0.0.1"
+edition = "2021"
+authors = ["Josep Bigorra <jjbigorra@gmail.com>"]
+license = "GPL-3.0-or-later"
+description = "Help screen for SSS (Supreme Sexp System) using GTK4 and LibAdwaita"
+readme = "README.org"
+homepage = "https://codeberg.org/jjba23/sss-help"
+repository = "https://codeberg.org/jjba23/sss-help"
+keywords = []
+categories = []
+
+[dependencies]
+log = "0.4"
+
+[profile.release]
+codegen-units = 1
+lto = true
