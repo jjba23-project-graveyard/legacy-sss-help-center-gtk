@@ -1,0 +1,36 @@
+#+TITLE: SSS Help Center
+#+AUTHOR: Your Name
+#+DATE: <2025-07-17 Thu>
+#+DESCRIPTION: An overview of the SSS Help Center application, its architecture, and the technologies used.
+
+* Introduction
+
+Welcome to the SSS Help Center, the official application for user assistance and documentation within the Supreme S-exp System. This project is a modern, robust, and user-friendly help client designed from the ground up to provide a seamless experience.
+
+The core of this application is built using Rust, a language known for its performance and safety, ensuring that the help center is both fast and reliable. The user interface is crafted with the latest GNOME desktop technologies, including GTK 4 and LibAdwaita, to offer a modern, clean, adaptive, and intuitive experience that feels right at home on the SSS desktop.
+
+* UI/UX: GTK 4, LibAdwaita, and GNOME Integration
+
+The user interface is a critical component of the SSS Help Center, and for this, we have embraced the modern GTK 4 toolkit. GTK 4 provides a powerful and flexible foundation for creating rich, native applications. Layered on top of this is LibAdwaita, the official GNOME library that implements the GNOME Human Interface Guidelines (HIG). By using LibAdwaita, we ensure the Help Center has a polished, consistent look and feel that aligns with other GNOME applications. This includes features like adaptive layouts that work beautifully on any screen size, from a small tiled window to a large monitor, as well as support for dark mode and high-contrast themes. The application also integrates with various GNOME components, allowing it to hook into system-wide search and provide a cohesive user experience.
+
+* Backend and Language: The Power of Rust
+
+The decision to use Rust for the development of the SSS Help Center was a strategic one. Rust's emphasis on memory safety without a garbage collector allows us to build a highly performant and secure application.
+
+The language's strong type system and ownership model eliminate entire classes of common bugs at compile time, leading to a more stable and maintainable codebase.
+
+Furthermore, Rust's modern tooling and rich ecosystem, including excellent bindings to GTK and other system components via GObject introspection, make the development process efficient and enjoyable.
+
+* Getting Started
+
+** Building the project
+
+   To build the SSS Help Center, you will need to have Rust, Cargo, certain GTK dependencies and GNU Make installed.
+
+   You can do this and many ways, also with Nix or Guix, which we encourage
+
+   #+BEGIN_SRC shell
+   make nix-run
+   #+END_SRC
+
+*TODO* better packaging system and distribution via Guix
