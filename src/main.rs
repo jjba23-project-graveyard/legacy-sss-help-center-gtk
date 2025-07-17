@@ -113,21 +113,35 @@ fn main() -> glib::ExitCode {
         let system_keybindings: SystemKeybindings = fetch_all_data().unwrap();
 
         let size_group = SizeGroup::new(SizeGroupMode::Horizontal);
-        let pu_labels =
-            make_labels_from_bindings(&system_keybindings.power_user_bindings, &size_group);
 
-        let list_box = ListBox::new();
-        list_box.set_margin_top(12);
-        list_box.set_margin_bottom(12);
-        list_box.set_margin_start(18);
-        list_box.set_margin_end(18);
-        pu_labels.iter().for_each(|l| list_box.append(l));
+        let pubb = system_keybindings.power_user_bindings.as_object().unwrap();
 
-        let app_box = Box::new(Orientation::Vertical, 12);
+        let boxes: Vec<ListBox> = pubb
+            .iter()
+            .map(|(kk, vv)| {
+                let pu_labels = make_labels_from_bindings(&vv, &size_group);
+
+                let list_box = ListBox::new();
+                list_box.set_margin_top(16);
+                list_box.set_margin_bottom(16);
+                list_box.set_margin_start(24);
+                list_box.set_margin_end(24);
+
+                let lll = Label::new(Some(format!("{}", kk).as_str()));
+                list_box.append(&lll);
+                pu_labels.iter().for_each(|l| list_box.append(l));
+                list_box
+            })
+            .collect();
+
+        let app_box = Box::builder()
+            .orientation(Orientation::Vertical)
+            .spacing(12)
+            .build();
 
         app_box.append(&app_title);
         app_box.append(&app_button);
-        app_box.append(&list_box);
+        boxes.iter().for_each(|b| app_box.append(b));
 
         let scrolled_window = ScrolledWindow::builder()
             .hscrollbar_policy(PolicyType::Never) // Disable horizontal scrolling
