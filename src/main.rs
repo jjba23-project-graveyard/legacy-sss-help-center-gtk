@@ -15,12 +15,45 @@
 // You should have received a copy of the GNU General Public License
 // along with sss-help.  If not, see <https://www.gnu.org/licenses/>.
 
-use std::collections::HashMap;
 use std::process::Command;
 
-use gtk::builders::TextViewBuilder;
-use gtk::{glib, Box, Button, Label, Orientation, TextView};
-use gtk::{prelude::*, TextBuffer};
+use gtk::prelude::*;
+use gtk::{glib, Box, Button, Label, ListBox, Orientation, PolicyType, ScrolledWindow};
+use serde_json::Value;
+
+fn make_labels_from_bindings(vla: Value) -> Vec<Box> {
+    if let Some(pu_object_map) = vla.as_object() {
+        pu_object_map
+            .iter()
+            .map(|t| {
+                if let Some(pp_object_map) = t.1.as_object() {
+                    let xs: Vec<Box> = pp_object_map
+                        .values()
+                        .into_iter()
+                        .map(|vv| make_labels_from_bindings(vv.clone()))
+                        .flatten()
+                        .collect();
+
+                    let b = Box::new(Orientation::Horizontal, 12);
+                    b.append(&Label::new(Some(t.0)));
+                    let xx = vec![b];
+
+                    xx.into_iter().chain(xs).collect()
+                } else if let Some(pp_s) = t.1.as_str() {
+                    let b = Box::new(Orientation::Horizontal, 8);
+                    b.append(&Label::new(Some(t.0)));
+                    b.append(&Label::new(Some(pp_s)));
+                    vec![b]
+                } else {
+                    vec![]
+                }
+            })
+            .flatten()
+            .collect()
+    } else {
+        vec![]
+    }
+}
 
 fn main() -> glib::ExitCode {
     let application = adw::Application::builder()
@@ -34,21 +67,31 @@ fn main() -> glib::ExitCode {
             eprintln!("Clicked!");
         });
 
-        let power_user_keybindings_docs = fetch_and_display_data();
-        let app_puk = Label::new(Some(&power_user_keybindings_docs));
+        let system_keybindings: SystemKeybindings = fetch_and_display_data().unwrap();
 
-        let app_box = Box::new(Orientation::Vertical, 8);
+        let pu_labels = make_labels_from_bindings(system_keybindings.power_user_bindings);
+
+        let list_box = ListBox::new();
+        pu_labels.iter().for_each(|l| list_box.append(l));
+
+        let app_box = Box::new(Orientation::Vertical, 12);
 
         app_box.append(&app_title);
         app_box.append(&app_button);
-        app_box.append(&app_puk);
+        app_box.append(&list_box);
+
+        let scrolled_window = ScrolledWindow::builder()
+            .hscrollbar_policy(PolicyType::Never) // Disable horizontal scrolling
+            .min_content_width(360)
+            .child(&app_box)
+            .build();
 
         let window = adw::ApplicationWindow::builder()
             .application(app)
             .title("First GTK Program")
             .default_width(350)
             .default_height(70)
-            .content(&app_box)
+            .content(&scrolled_window)
             .build();
 
         window.present();
@@ -57,110 +100,98 @@ fn main() -> glib::ExitCode {
     application.run()
 }
 
-// Asynchronous function to handle the core logic:
-// 1. Execute `dconf read`.
-// 2. Base16 decode the output.
-// 3. Parse the decoded string as JSON.
-// 4. Format the result for display.
-fn fetch_and_display_data() -> String {
-    // Define the dconf key that we want to read.
-    let dconf_key = "/sss/power-user-keybindings-docs";
+#[derive(Debug, Clone)]
+struct FetchKeybindingsError(String);
 
-    // Execute the `dconf read` command.
-    // `Command::new` creates a new command, `arg` adds arguments, and `output()` executes it.
-    let output = Command::new("dconf").arg("read").arg(dconf_key).output();
+#[derive(Debug, Clone)]
+struct SystemKeybindings {
+    power_user_bindings: Value,
+    universal_session_bindings: Value,
+}
 
-    // Process the result of the dconf command execution.
-    let dconf_output = match output {
+fn fetch_and_display_data() -> Result<SystemKeybindings, FetchKeybindingsError> {
+    let power_user_dconf_key = "/sss/power-user-keybindings-docs";
+    let universal_session_dconf_key = "/sss/universal-session-keybindings-docs";
+
+    let power_user_output: Result<std::process::Output, std::io::Error> = Command::new("dconf")
+        .arg("read")
+        .arg(power_user_dconf_key)
+        .output();
+
+    let power_user_bindings = parse_bindings(power_user_output)?;
+
+    let universal_session_output: Result<std::process::Output, std::io::Error> =
+        Command::new("dconf")
+            .arg("read")
+            .arg(universal_session_dconf_key)
+            .output();
+
+    let universal_session_bindings = parse_bindings(universal_session_output)?;
+
+    Ok(SystemKeybindings {
+        power_user_bindings: power_user_bindings,
+        universal_session_bindings: universal_session_bindings,
+    })
+}
+
+fn parse_bindings(
+    command_output: Result<std::process::Output, std::io::Error>,
+) -> Result<Value, FetchKeybindingsError> {
+    let dconf_output: Result<String, FetchKeybindingsError> = match command_output {
         Ok(output) => {
-            // Check if the command executed successfully (exit code 0).
             if output.status.success() {
-                // Convert the stdout (standard output) bytes to a UTF-8 string.
-                // `String::from_utf8_lossy` handles invalid UTF-8 characters gracefully.
-                // `.trim()` removes leading/trailing whitespace (like newlines).
-                String::from_utf8_lossy(&output.stdout).trim().to_string()
+                Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
             } else {
-                // If the command failed, return an error message including its stderr.
-                return format!(
+                return Err(FetchKeybindingsError(format!(
                     "Error: dconf command failed.\nStderr: {}",
                     String::from_utf8_lossy(&output.stderr)
-                );
+                )));
             }
         }
         Err(e) => {
-            // If the command itself could not be executed (e.g., `dconf` not found in PATH),
-            // return an error message.
-            return format!("Error executing dconf command: {}", e);
+            return Err(FetchKeybindingsError(format!(
+                "Error executing dconf command: {}",
+                e
+            )));
         }
     };
 
-    // dconf often returns string values wrapped in single quotes (e.g., `'deadbeef'`).
-    // We need to remove these quotes before attempting Base16 decoding.
-    let base16_encoded = if dconf_output.starts_with('\'') && dconf_output.ends_with('\'') {
-        // Slice the string to remove the first and last characters (the quotes).
-        dconf_output[1..dconf_output.len() - 1].to_string()
-    } else {
-        // If no quotes are present, use the output string as is.
-        dconf_output
-    };
+    match dconf_output {
+        Ok(d) => {
+            // dconf often returns string values wrapped in single quotes.
+            // We need to remove these quotes before attempting Base16 decoding.
+            let base16_encoded = if d.starts_with('\'') && d.ends_with('\'') {
+                d[1..d.len() - 1].to_string()
+            } else {
+                d
+            };
 
-    // Attempt to decode the Base16 encoded string into raw bytes.
-    let decoded_bytes = match base16::decode(&base16_encoded) {
-        Ok(bytes) => bytes, // If successful, we get a vector of bytes.
-        Err(e) => {
-            // If Base16 decoding fails, return an error message with the original input.
-            return format!("Error decoding Base16: {}. Input: '{}'", e, base16_encoded);
-        }
-    };
+            let decoded_bytes = match base16::decode(&base16_encoded) {
+                Ok(bytes) => bytes, // If successful, we get a vector of bytes.
+                Err(e) => {
+                    // If Base16 decoding fails, return an error message with the original input.
+                    return Err(FetchKeybindingsError(format!(
+                        "Error decoding Base16: {}. Input: '{}'",
+                        e, base16_encoded
+                    )));
+                }
+            };
 
-    // Attempt to convert the decoded bytes into a UTF-8 string.
-    // This assumes the Base16 decoded content is valid UTF-8 JSON.
-    let json_string = match String::from_utf8(decoded_bytes) {
-        Ok(s) => s, // If successful, we get the JSON string.
-        Err(e) => {
-            // If the bytes cannot be interpreted as UTF-8, return an error.
-            return format!("Error converting bytes to UTF-8: {}", e);
-        }
-    };
+            let json_string = match String::from_utf8(decoded_bytes) {
+                Ok(s) => s,
+                Err(e) => {
+                    return Err(FetchKeybindingsError(format!(
+                        "Error converting bytes to UTF-8: {}",
+                        e
+                    )));
+                }
+            };
 
-    // Attempt to parse the UTF-8 string as a generic JSON `serde_json::Value`.
-    // This is flexible and can handle any valid JSON structure (objects, arrays, primitives).
-    let parsed_json: serde_json::Result<serde_json::Value> = serde_json::from_str(&json_string);
-
-    match parsed_json {
-        Ok(json_value) => {
-            // If parsing to `serde_json::Value` is successful, pretty-print the JSON.
-            // Pretty-printing makes the JSON human-readable with indentation.
-            match serde_json::to_string_pretty(&json_value) {
-                Ok(pretty_json) => pretty_json, // Return the pretty-printed JSON string.
-                Err(e) => format!("Error pretty-printing JSON: {}", e), // Error during pretty-printing.
-            }
-        }
-        Err(e) => {
-            // If parsing to `serde_json::Value` fails (e.g., invalid JSON format),
-            // attempt to parse it as a simple `HashMap<String, String>`.
-            // This is a fallback for simpler JSON structures.
-            let parsed_hashmap: serde_json::Result<HashMap<String, String>> =
+            let parsed_json: serde_json::Result<serde_json::Value> =
                 serde_json::from_str(&json_string);
-            match parsed_hashmap {
-                Ok(hashmap) => {
-                    // If parsing to HashMap is successful, format it as simple key-value pairs.
-                    let mut display_text = String::new();
-                    for (key, value) in hashmap {
-                        display_text.push_str(&format!("{}: {}\n", key, value));
-                    }
-                    display_text // Return the formatted key-value string.
-                }
-                Err(_) => {
-                    // If neither `serde_json::Value` nor `HashMap` parsing works,
-                    // it means the content is likely not valid JSON or is in an unexpected format.
-                    // Return the original JSON parsing error and the raw decoded content for debugging.
-                    format!(
-                        "Error parsing JSON: {}\nRaw decoded content:\n{}",
-                        e, json_string
-                    )
-                }
-            }
+            let pp = parsed_json.map_err(|e| FetchKeybindingsError(e.to_string()));
+            pp
         }
+        Err(e) => return Err(e),
     }
 }
