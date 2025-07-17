@@ -1,9 +1,9 @@
-#+TITLE: SSS Help Center
-#+AUTHOR: Your Name
+#+TITLE: sss-help-center-gtk
+#+AUTHOR: Josep Bigorra
+#+email: jjbigorra@gmail.com
 #+DATE: <2025-07-17 Thu>
-#+DESCRIPTION: An overview of the SSS Help Center application, its architecture, and the technologies used.
 
-Welcome to the SSS Help Center, the official application for user assistance and documentation within the  [[https://codeberg.org/jjba23/sss][Supreme Sexp System]]. This project is a modern, robust, and user-friendly help and keybinding view client designed from the ground up to provide a seamless experience.
+Welcome to the SSS Help Center GTK, the user assistance and documentation application within the  [[https://codeberg.org/jjba23/sss][Supreme Sexp System]]. This project is a modern, robust, and user-friendly help and keybinding view client designed from the ground up to provide a seamless experience.
 
 The core of this application is built using Rust, a language known for its performance and safety, ensuring that the help center is both fast and reliable. The user interface is crafted with the latest GNOME desktop technologies, including GTK 4 and LibAdwaita, to offer a modern, clean, adaptive, and intuitive experience that feels right at home on the SSS desktop.
 
