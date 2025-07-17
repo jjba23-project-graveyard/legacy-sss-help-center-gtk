@@ -46,12 +46,18 @@ fn make_labels_from_bindings(vla: Value) -> Vec<ListBoxRow> {
                     let b = ListBoxRow::new();
                     let kb = Label::new(Some(format!("<tt>{}</tt>", t.0).as_str()));
                     kb.set_use_markup(true);
+                    kb.set_xalign(0.0);
+                    kb.set_hexpand(false);
+                    kb.set_width_request(10);
                     let expl = Label::new(Some(pp_s));
                     expl.set_use_markup(true);
+                    expl.set_wrap(true);
+                    expl.set_xalign(0.0);
+                    expl.set_hexpand(true);
 
                     let row_grid = gtk::Grid::builder()
-                        .row_spacing(5)
-                        .column_spacing(10)
+                        .row_spacing(8)
+                        .column_spacing(24)
                         .build();
 
                     row_grid.attach(&kb, 0, 0, 1, 1);
@@ -72,7 +78,7 @@ fn make_labels_from_bindings(vla: Value) -> Vec<ListBoxRow> {
 
 fn main() -> glib::ExitCode {
     let application = adw::Application::builder()
-        .application_id("com.example.FirstGtkApp")
+        .application_id("sss.Help")
         .build();
 
     application.connect_activate(|app| {
@@ -87,6 +93,10 @@ fn main() -> glib::ExitCode {
         let pu_labels = make_labels_from_bindings(system_keybindings.power_user_bindings);
 
         let list_box = ListBox::new();
+        list_box.set_margin_top(12);
+        list_box.set_margin_bottom(12);
+        list_box.set_margin_start(18);
+        list_box.set_margin_end(18);
         pu_labels.iter().for_each(|l| list_box.append(l));
 
         let app_box = Box::new(Orientation::Vertical, 12);
@@ -103,7 +113,7 @@ fn main() -> glib::ExitCode {
 
         let window = adw::ApplicationWindow::builder()
             .application(app)
-            .title("First GTK Program")
+            .title("SSS Help")
             .default_width(350)
             .default_height(70)
             .content(&scrolled_window)
