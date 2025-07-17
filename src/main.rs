@@ -17,38 +17,47 @@
 
 use std::process::Command;
 
-use gtk::prelude::*;
+use gtk::builders::GridBuilder;
 use gtk::{glib, Box, Button, Label, ListBox, Orientation, PolicyType, ScrolledWindow};
+use gtk::{prelude::*, ListBoxRow};
 use serde_json::Value;
 
-fn make_labels_from_bindings(vla: Value) -> Vec<Box> {
+fn make_labels_from_bindings(vla: Value) -> Vec<ListBoxRow> {
     if let Some(pu_object_map) = vla.as_object() {
         pu_object_map
             .iter()
             .map(|t| {
                 if let Some(pp_object_map) = t.1.as_object() {
-                    let xs: Vec<Box> = pp_object_map
+                    let xs: Vec<ListBoxRow> = pp_object_map
                         .values()
                         .into_iter()
                         .map(|vv| make_labels_from_bindings(vv.clone()))
                         .flatten()
                         .collect();
 
-                    let b = Box::new(Orientation::Horizontal, 12);
+                    let b = ListBoxRow::new();
                     let tit = Label::new(Some(t.0));
                     tit.set_use_markup(true);
-                    b.append(&tit);
+                    b.set_child(Some(&tit));
                     let xx = vec![b];
 
                     xx.into_iter().chain(xs).collect()
                 } else if let Some(pp_s) = t.1.as_str() {
-                    let b = Box::new(Orientation::Horizontal, 8);
+                    let b = ListBoxRow::new();
                     let kb = Label::new(Some(format!("<tt>{}</tt>", t.0).as_str()));
                     kb.set_use_markup(true);
                     let expl = Label::new(Some(pp_s));
                     expl.set_use_markup(true);
-                    b.append(&kb);
-                    b.append(&expl);
+
+                    let row_grid = gtk::Grid::builder()
+                        .row_spacing(5)
+                        .column_spacing(10)
+                        .build();
+
+                    row_grid.attach(&kb, 0, 0, 1, 1);
+                    row_grid.attach(&expl, 1, 0, 1, 1);
+
+                    b.set_child(Some(&row_grid));
                     vec![b]
                 } else {
                     vec![]
