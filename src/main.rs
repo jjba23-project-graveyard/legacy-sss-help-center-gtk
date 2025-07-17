@@ -17,7 +17,10 @@
 
 use std::process::Command;
 
-use gtk::{glib, Box, Button, Label, ListBox, Orientation, PolicyType, ScrolledWindow};
+use gtk::{
+    glib, Box, Button, Label, ListBox, Orientation, PolicyType, ScrolledWindow, SizeGroup,
+    SizeGroupMode,
+};
 use gtk::{prelude::*, ListBoxRow};
 use serde_json::Value;
 use std::fmt;
@@ -49,23 +52,22 @@ struct SystemKeybindings {
     universal_session_bindings: Value,
 }
 
-fn make_labels_from_bindings(vla: &Value) -> Vec<ListBoxRow> {
-    // Use flat_map to simplify collecting nested results
+fn make_labels_from_bindings(vla: &Value, size_group: &SizeGroup) -> Vec<ListBoxRow> {
     vla.as_object()
         .into_iter()
         .flatten()
         .flat_map(|(key, val)| {
             let mut rows = Vec::new();
             match val {
-                // If the value is an object, it's a category title.
-                // Create a title row and recurse to get its children.
+                // If the value is an object, it's a category.
+                // Create a title row and recurs to get its children.
                 Value::Object(_) => {
                     let title_row = ListBoxRow::new();
                     let title_label = Label::builder().label(key).use_markup(true).build();
                     title_row.set_child(Some(&title_label));
 
                     rows.push(title_row);
-                    rows.extend(make_labels_from_bindings(val)); // Recursive call
+                    rows.extend(make_labels_from_bindings(val, size_group)); // Recursive call
                 }
                 // If it's a string, it's a keybinding entry.
                 Value::String(s) => {
@@ -73,6 +75,8 @@ fn make_labels_from_bindings(vla: &Value) -> Vec<ListBoxRow> {
                     let kb_label = Label::new(Some(&format!("<tt>{}</tt>", key)));
                     kb_label.set_use_markup(true);
                     kb_label.set_xalign(0.0);
+
+                    size_group.add_widget(&kb_label);
 
                     let expl_label = Label::new(Some(s.as_str()));
                     expl_label.set_wrap(true);
@@ -108,7 +112,9 @@ fn main() -> glib::ExitCode {
 
         let system_keybindings: SystemKeybindings = fetch_all_data().unwrap();
 
-        let pu_labels = make_labels_from_bindings(&system_keybindings.power_user_bindings);
+        let size_group = SizeGroup::new(SizeGroupMode::Horizontal);
+        let pu_labels =
+            make_labels_from_bindings(&system_keybindings.power_user_bindings, &size_group);
 
         let list_box = ListBox::new();
         list_box.set_margin_top(12);
