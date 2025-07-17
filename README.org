@@ -9,21 +9,21 @@ The core of this application is built using Rust, a language known for its perfo
 
 --------------------------------
 
+* Backend and Language: The Power of Rust
+
+The decision to use Rust for the development of the SSS Help Center is a strategic one. Rust allows us to build a highly performant and secure application.
+
+The language's strong type system and ownership model eliminate entire classes of common bugs at compile time, leading to a more stable and maintainable codebase.
+
+Furthermore, Rust's modern tooling and rich ecosystem, including excellent bindings to GTK and other system components make the development process efficient and enjoyable.
+
+--------------------------------
+
 * UI/UX: GTK 4, LibAdwaita, and GNOME Integration
 
 The user interface is a critical component of the SSS Help Center, and for this, we have embraced the modern GTK 4 toolkit. GTK 4 provides a powerful and flexible foundation for creating rich, native applications. Layered on top of this is Libadwaita, the official GNOME library that implements the GNOME Human Interface Guidelines (HIG).
 
 By using Libadwaita, we ensure the Help Center has a modern, polished, consistent look and feel that aligns with other GNOME applications. This includes features like adaptive layouts that work beautifully on any screen size, from a small tiled window to a large monitor, as well as support for dark mode and high-contrast themes.
-
---------------------------------
-
-* Backend and Language: The Power of Rust
-
-The decision to use Rust for the development of the SSS Help Center was a strategic one. Rust's emphasis on memory safety without a garbage collector allows us to build a highly performant and secure application.
-
-The language's strong type system and ownership model eliminate entire classes of common bugs at compile time, leading to a more stable and maintainable codebase.
-
-Furthermore, Rust's modern tooling and rich ecosystem, including excellent bindings to GTK and other system components via GObject introspection, make the development process efficient and enjoyable.
 
 --------------------------------
 
@@ -51,11 +51,11 @@ From SSS we store user settings to ~dconf~ and usually strings, numbers, bools, 
 
 * Licensing
 
-sss and all of its source code are free software, licensed under the GNU General Public License v3 (or newer at your convenience).
+sss-help-center-gtk and all of its source code are free software, licensed under the GNU General Public License v3 (or newer at your convenience).
 
 https://www.gnu.org/licenses/gpl-3.0.html
 
-The documentation and examples, including this document, which are provided with sss, are all licensed under the GNU Free Documentation License v1.3 (or newer at your convenience).
+The documentation and examples, including this document, which are provided with sss-help-center-gtk, are all licensed under the GNU Free Documentation License v1.3 (or newer at your convenience).
 
 https://www.gnu.org/licenses/fdl-1.3.html
 
