@@ -1,5 +1,5 @@
 {
-  description = "A Nix-flake-based Rust development environment";
+  description = "SSS Help Center GTK";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
