@@ -3,15 +3,19 @@
 #+DATE: <2025-07-17 Thu>
 #+DESCRIPTION: An overview of the SSS Help Center application, its architecture, and the technologies used.
 
-* Introduction
-
 Welcome to the SSS Help Center, the official application for user assistance and documentation within the Supreme S-exp System. This project is a modern, robust, and user-friendly help client designed from the ground up to provide a seamless experience.
 
 The core of this application is built using Rust, a language known for its performance and safety, ensuring that the help center is both fast and reliable. The user interface is crafted with the latest GNOME desktop technologies, including GTK 4 and LibAdwaita, to offer a modern, clean, adaptive, and intuitive experience that feels right at home on the SSS desktop.
 
+--------------------------------
+
 * UI/UX: GTK 4, LibAdwaita, and GNOME Integration
 
-The user interface is a critical component of the SSS Help Center, and for this, we have embraced the modern GTK 4 toolkit. GTK 4 provides a powerful and flexible foundation for creating rich, native applications. Layered on top of this is LibAdwaita, the official GNOME library that implements the GNOME Human Interface Guidelines (HIG). By using LibAdwaita, we ensure the Help Center has a polished, consistent look and feel that aligns with other GNOME applications. This includes features like adaptive layouts that work beautifully on any screen size, from a small tiled window to a large monitor, as well as support for dark mode and high-contrast themes. The application also integrates with various GNOME components, allowing it to hook into system-wide search and provide a cohesive user experience.
+The user interface is a critical component of the SSS Help Center, and for this, we have embraced the modern GTK 4 toolkit. GTK 4 provides a powerful and flexible foundation for creating rich, native applications. Layered on top of this is Libadwaita, the official GNOME library that implements the GNOME Human Interface Guidelines (HIG).
+
+By using Libadwaita, we ensure the Help Center has a modern, polished, consistent look and feel that aligns with other GNOME applications. This includes features like adaptive layouts that work beautifully on any screen size, from a small tiled window to a large monitor, as well as support for dark mode and high-contrast themes.
+
+--------------------------------
 
 * Backend and Language: The Power of Rust
 
@@ -20,6 +24,8 @@ The decision to use Rust for the development of the SSS Help Center was a strate
 The language's strong type system and ownership model eliminate entire classes of common bugs at compile time, leading to a more stable and maintainable codebase.
 
 Furthermore, Rust's modern tooling and rich ecosystem, including excellent bindings to GTK and other system components via GObject introspection, make the development process efficient and enjoyable.
+
+--------------------------------
 
 * Getting Started
 
@@ -34,3 +40,46 @@ Furthermore, Rust's modern tooling and rich ecosystem, including excellent bindi
    #+END_SRC
 
 *TODO* better packaging system and distribution via Guix
+
+** How this works
+
+This Rust application serves as a help viewer for the "Supreme S-exp System," specifically designed to display help to users and system keybindings. Its primary function is to read configuration data from the system using the ~dconf~ command-line utility. 
+
+From SSS we store user settings to ~dconf~ and usually strings, numbers, bools, and string-big payloads as JSON + base16 strings.
+
+--------------------------------
+
+* Licensing
+
+sss and all of its source code are free software, licensed under the GNU General Public License v3 (or newer at your convenience).
+
+https://www.gnu.org/licenses/gpl-3.0.html
+
+The documentation and examples, including this document, which are provided with sss, are all licensed under the GNU Free Documentation License v1.3 (or newer at your convenience).
+
+https://www.gnu.org/licenses/fdl-1.3.html
+
+---------
+
+* Code of conduct
+
+This project adheres to the jointhefreeworld code of conduct. Find it here:
+
+https://jointhefreeworld.org/blog/articles/personal/jointhefreeworld-code-of-conduct/index.html
+
+In summary, we foster an inclusive, respectful, and cooperative environment for all contributors and users of this free software project. Inspired by the ideals of the GNU Project, we strive to uphold freedom, equality, and community as guiding principles. We believe that collaboration in a community of mutual respect is essential to creating excellent free software.
+
+
+--------------
+
+* SSS Project
+
+Contributing to free software is a uniquely beautiful act because it embodies principles of generosity, collaboration, and empowerment.
+
+We welcome everyone to feel invited to the SSS Project, and encourage active contribution in all forms, to improve it and/or suggest improvements, brainstorm with me, make it more modular/flexible, etc, feel free to contact me <jjbigorra@gmail.com> to chat, discuss or report feedback.
+
+Find here the Backlog and Kanban boards for SSS: https://lucidplan.jointhefreeworld.org/tickets/sss
+
+----------
+
+
