@@ -35,14 +35,20 @@ fn make_labels_from_bindings(vla: Value) -> Vec<Box> {
                         .collect();
 
                     let b = Box::new(Orientation::Horizontal, 12);
-                    b.append(&Label::new(Some(t.0)));
+                    let tit = Label::new(Some(t.0));
+                    tit.set_use_markup(true);
+                    b.append(&tit);
                     let xx = vec![b];
 
                     xx.into_iter().chain(xs).collect()
                 } else if let Some(pp_s) = t.1.as_str() {
                     let b = Box::new(Orientation::Horizontal, 8);
-                    b.append(&Label::new(Some(t.0)));
-                    b.append(&Label::new(Some(pp_s)));
+                    let kb = Label::new(Some(format!("<tt>{}</tt>", t.0).as_str()));
+                    kb.set_use_markup(true);
+                    let expl = Label::new(Some(pp_s));
+                    expl.set_use_markup(true);
+                    b.append(&kb);
+                    b.append(&expl);
                     vec![b]
                 } else {
                     vec![]
