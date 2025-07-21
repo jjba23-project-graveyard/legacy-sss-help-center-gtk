@@ -17,6 +17,8 @@
 
 use std::process::Command;
 
+use adw::builders::NavigationSplitViewBuilder;
+use adw::{NavigationPage, NavigationSplitView};
 use gtk::{
     glib, Box, Button, Label, ListBox, Orientation, PolicyType, ScrolledWindow, SizeGroup,
     SizeGroupMode,
@@ -139,14 +141,33 @@ fn main() -> glib::ExitCode {
             .spacing(12)
             .build();
 
+        let sidebar_box = Box::builder()
+            .orientation(Orientation::Vertical)
+            .spacing(12)
+            .build();
+        sidebar_box.set_margin_top(16);
+        sidebar_box.set_margin_bottom(16);
+        sidebar_box.set_margin_start(24);
+        sidebar_box.set_margin_end(24);
+        sidebar_box.append(&Label::new(Some("SSS")));
+
         app_box.append(&app_title);
         app_box.append(&app_button);
         boxes.iter().for_each(|b| app_box.append(b));
 
+        let app_sidebar = NavigationPage::builder().child(&sidebar_box).build();
+
+        let app_content = NavigationPage::builder().child(&app_box).build();
+
+        let ansv = NavigationSplitView::builder()
+            .sidebar(&app_sidebar)
+            .content(&app_content)
+            .build();
+
         let scrolled_window = ScrolledWindow::builder()
             .hscrollbar_policy(PolicyType::Never) // Disable horizontal scrolling
             .min_content_width(360)
-            .child(&app_box)
+            .child(&ansv)
             .build();
 
         let window = adw::ApplicationWindow::builder()
