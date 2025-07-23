@@ -15,10 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with sss-help.  If not, see <https://www.gnu.org/licenses/>.
 
-use adw::{NavigationPage, NavigationSplitView};
+use adw::{HeaderBar, NavigationPage, NavigationSplitView};
 use gtk::{
-    glib, Box, Button, Label, ListBox, Orientation, PolicyType, ScrolledWindow, SizeGroup,
-    SizeGroupMode,
+    glib, Align, Box, Button, Label, ListBox, Orientation, PolicyType, ScrolledWindow, SizeGroup, SizeGroupMode
 };
 use gtk::{prelude::*, ListBoxRow};
 use serde_json::Value;
@@ -38,7 +37,7 @@ fn make_labels_from_bindings(vla: &Value, size_group: &SizeGroup) -> Vec<ListBox
                 // Create a title row and recurs to get its children.
                 Value::Object(_) => {
                     let title_row = ListBoxRow::new();
-                    let title_label = Label::builder().label(key).use_markup(true).build();
+                    let title_label = Label::builder().label(format!("--------- {} ---------", key)).use_markup(true).build();
                     title_row.set_child(Some(&title_label));
 
                     rows.push(
@@ -99,7 +98,8 @@ fn main() -> glib::ExitCode {
         .build();
 
     application.connect_activate(|app| {
-        let app_title = Label::new(Some("Supreme Sexp System (SSS) - Help"));
+
+        let app_title = Label::builder().label("Supreme Sexp System (SSS) - Help").build();
         let app_button = Button::with_label("Click me!");
         app_button.connect_clicked(|_| {
             eprintln!("Clicked!");
@@ -111,8 +111,45 @@ fn main() -> glib::ExitCode {
             .vexpand(false)
             .build();
 
+        let desc_box = Box::builder()
+            .orientation(Orientation::Vertical)
+            .spacing(12)
+            .vexpand(false)
+            .halign(Align::Center)
+            .margin_top(12)
+            .margin_bottom(12)
+            .margin_start(32)
+            .margin_end(32)
+            .build();        
+
         welcome_box.append(&app_title);
         welcome_box.append(&app_button);
+
+        let sss_desc_labels: Vec<Label> = vec![
+                        Label::builder()
+                .label("SSS (Supreme Sexp System) is a modern version of the Lisp machines of yore.")
+                                .wrap(true)
+                .build(),
+            Label::builder()
+                .label("This is a custom GNU + Linux setup lets you customize everything endlessly, inspires creativity and problem-solving, and gives you a great user experience.")
+                                .wrap(true)
+                .build(),
+
+            Label::builder()
+                .label("With this one obtains a computing style and programming environment that can be referred to as Lisp user space.")
+                .wrap(true)
+                .build(),
+            Label::builder()
+                .label("You can be aware of all the code that is running on your machine, which puts free GNU systems among the most secure operating systems on Earth.")
+                                .wrap(true)
+                .build()
+        ];   
+        
+
+        sss_desc_labels.into_iter().for_each(|l| desc_box.append(&l));
+                welcome_box.append(&desc_box);
+
+        // ------------------
 
         let system_keybindings: SystemKeybindings = fetch_all_binding_data().unwrap();
 
@@ -140,7 +177,7 @@ fn main() -> glib::ExitCode {
             &size_group,
         );
 
-        let welcome_page = NavigationPage::builder().child(&welcome_box).build();
+        let welcome_page = NavigationPage::builder().child(&welcome_box).title("Supreme Sexp System (SSS) - Help").build();
 
         let navigation_split_view = NavigationSplitView::builder()
             .sidebar(&app_sidebar)
@@ -159,10 +196,10 @@ fn main() -> glib::ExitCode {
 
         let window = adw::ApplicationWindow::builder()
             .application(app)
-            .title("SSS Help")
+            .title("Supreme Sexp System (SSS) - Help")
             .default_width(350)
             .default_height(200)
-            .content(&navigation_split_view)
+            .content(&navigation_split_view)            
             .build();
 
         window.present();
@@ -172,16 +209,16 @@ fn main() -> glib::ExitCode {
 }
 
 fn make_power_user_page(
-    pubb: &serde_json::Map<String, Value>,
+    bindings: &serde_json::Map<String, Value>,
     size_group: &SizeGroup,
 ) -> NavigationPage {
-    let power_user_box = Box::builder()
+    let main_box = Box::builder()
         .orientation(Orientation::Vertical)
         .spacing(12)
         .vexpand(false)
         .build();
 
-    let boxes: Vec<ListBox> = pubb
+    let binding_group_boxes: Vec<ListBox> = bindings
         .iter()
         .map(|(kk, vv)| {
             let pu_labels = make_labels_from_bindings(&vv, size_group);
@@ -201,17 +238,20 @@ fn make_power_user_page(
         })
         .collect();
 
-    boxes.iter().for_each(|b| power_user_box.append(b));
+    binding_group_boxes.iter().for_each(|b| main_box.append(b));
 
     let scrolled_window = ScrolledWindow::builder()
         .hscrollbar_policy(PolicyType::Never) // Disable horizontal scrolling
         .min_content_width(360)
         .min_content_height(360)
-        .child(&power_user_box)
+        .child(&main_box)
         .build();
 
     NavigationPage::builder()
-        .title("Power user session")
+        .title("SSS - Power user session")
         .child(&scrolled_window)
         .build()
 }
+
+
+
