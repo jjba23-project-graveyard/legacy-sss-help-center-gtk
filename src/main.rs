@@ -15,46 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with sss-help.  If not, see <https://www.gnu.org/licenses/>.
 
-use std::iter::Map;
-use std::process::Command;
-
-use adw::builders::NavigationSplitViewBuilder;
 use adw::{NavigationPage, NavigationSplitView};
-use gtk::glib::closure_local;
 use gtk::{
     glib, Box, Button, Label, ListBox, Orientation, PolicyType, ScrolledWindow, SizeGroup,
     SizeGroupMode,
 };
 use gtk::{prelude::*, ListBoxRow};
 use serde_json::Value;
-use std::fmt;
 
-#[derive(Debug)]
-enum KeybindingError {
-    DconfCommand(std::io::Error),
-    DconfFailed(String),
-    Base16(base16::DecodeError),
-    Utf8(std::string::FromUtf8Error),
-    Json(serde_json::Error),
-}
+use crate::keybinds::{fetch_all_binding_data, SystemKeybindings};
 
-impl fmt::Display for KeybindingError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::DconfCommand(e) => write!(f, "Failed to execute dconf command: {}", e),
-            Self::DconfFailed(stderr) => write!(f, "dconf command failed: {}", stderr),
-            Self::Base16(e) => write!(f, "Failed to decode Base16 string: {}", e),
-            Self::Utf8(e) => write!(f, "Failed to parse UTF-8 string: {}", e),
-            Self::Json(e) => write!(f, "Failed to parse JSON: {}", e),
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-struct SystemKeybindings {
-    power_user_bindings: Value,
-    universal_session_bindings: Value,
-}
+pub mod keybinds;
 
 fn make_labels_from_bindings(vla: &Value, size_group: &SizeGroup) -> Vec<ListBoxRow> {
     vla.as_object()
@@ -143,7 +114,7 @@ fn main() -> glib::ExitCode {
         welcome_box.append(&app_title);
         welcome_box.append(&app_button);
 
-        let system_keybindings: SystemKeybindings = fetch_all_data().unwrap();
+        let system_keybindings: SystemKeybindings = fetch_all_binding_data().unwrap();
 
         let size_group = SizeGroup::new(SizeGroupMode::Horizontal);
 
@@ -156,7 +127,7 @@ fn main() -> glib::ExitCode {
             .margin_end(24)
             .build();
 
-        let welcome_page_button = Button::with_label("SSS");
+        let welcome_page_button = Button::with_label("Welcome to SSS");
         let power_user_page_button = Button::with_label("Power user");
 
         sidebar_box.append(&welcome_page_button);
@@ -175,13 +146,15 @@ fn main() -> glib::ExitCode {
             .sidebar(&app_sidebar)
             .content(&welcome_page)
             .build();
+        let navigation_split_view_clone = navigation_split_view.clone();
+        let navigation_split_view_clone2 = navigation_split_view.clone();
 
-        // welcome_page_button.connect_clicked(move |_| {
-        //     navigation_split_view.set_content(Some(&welcome_page));
-        // });
+        welcome_page_button.connect_clicked(move |_| {
+            let _ = &navigation_split_view_clone2.set_content(Some(&welcome_page));
+        });
 
         power_user_page_button.connect_clicked(move |_| {
-            &navigation_split_view.set_content(Some(&power_user_page));
+            let _ = &navigation_split_view_clone.set_content(Some(&power_user_page));
         });
 
         let window = adw::ApplicationWindow::builder()
@@ -241,42 +214,4 @@ fn make_power_user_page(
         .title("Power user session")
         .child(&scrolled_window)
         .build()
-}
-
-fn fetch_single_binding(dconf_key: &str) -> Result<Value, KeybindingError> {
-    let command_output = Command::new("dconf").arg("read").arg(dconf_key).output();
-    parse_bindings(command_output)
-}
-
-fn fetch_all_data() -> Result<SystemKeybindings, KeybindingError> {
-    let power_user_bindings = fetch_single_binding("/sss/power-user-keybindings-docs")?;
-    let universal_session_bindings =
-        fetch_single_binding("/sss/universal-session-keybindings-docs")?;
-
-    Ok(SystemKeybindings {
-        power_user_bindings,
-        universal_session_bindings,
-    })
-}
-
-fn parse_bindings(
-    command_output: Result<std::process::Output, std::io::Error>,
-) -> Result<Value, KeybindingError> {
-    let output = command_output.map_err(KeybindingError::DconfCommand)?;
-    if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr).to_string();
-        return Err(KeybindingError::DconfFailed(stderr));
-    }
-
-    let raw_stdout = String::from_utf8(output.stdout).map_err(KeybindingError::Utf8)?;
-
-    // dconf wraps strings in single quotes, remove them
-    let base16_encoded = raw_stdout.trim().trim_matches('\'');
-
-    // Decode from Base16, parse to UTF-8, then parse as JSON
-    let decoded_bytes = base16::decode(base16_encoded).map_err(KeybindingError::Base16)?;
-    let json_string = String::from_utf8(decoded_bytes).map_err(KeybindingError::Utf8)?;
-    let parsed_json = serde_json::from_str(&json_string).map_err(KeybindingError::Json)?;
-
-    Ok(parsed_json)
 }
