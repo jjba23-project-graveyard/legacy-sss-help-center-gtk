@@ -15,10 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with sss-help.  If not, see <https://www.gnu.org/licenses/>.
 
+use std::iter::Map;
 use std::process::Command;
 
 use adw::builders::NavigationSplitViewBuilder;
 use adw::{NavigationPage, NavigationSplitView};
+use gtk::glib::closure_local;
 use gtk::{
     glib, Box, Button, Label, ListBox, Orientation, PolicyType, ScrolledWindow, SizeGroup,
     SizeGroupMode,
@@ -68,7 +70,18 @@ fn make_labels_from_bindings(vla: &Value, size_group: &SizeGroup) -> Vec<ListBox
                     let title_label = Label::builder().label(key).use_markup(true).build();
                     title_row.set_child(Some(&title_label));
 
+                    rows.push(
+                        ListBoxRow::builder()
+                            .child(&Label::builder().label("").build())
+                            .build(),
+                    );
+
                     rows.push(title_row);
+                    rows.push(
+                        ListBoxRow::builder()
+                            .child(&Label::builder().label("").build())
+                            .build(),
+                    );
                     rows.extend(make_labels_from_bindings(val, size_group)); // Recursive call
                 }
                 // If it's a string, it's a keybinding entry.
@@ -77,7 +90,9 @@ fn make_labels_from_bindings(vla: &Value, size_group: &SizeGroup) -> Vec<ListBox
                     let kb_label = Label::builder()
                         .label(format!("<tt>{}</tt>", key))
                         .use_markup(true)
+                        .selectable(true)
                         .xalign(0.0)
+                        .margin_start(6)
                         .build();
 
                     size_group.add_widget(&kb_label);
@@ -86,6 +101,8 @@ fn make_labels_from_bindings(vla: &Value, size_group: &SizeGroup) -> Vec<ListBox
                         .label(s.as_str())
                         .wrap(true)
                         .xalign(0.0)
+                        .selectable(true)
+                        .margin_start(6)
                         .build();
 
                     let row_grid = gtk::Grid::builder().column_spacing(24).build();
@@ -94,6 +111,7 @@ fn make_labels_from_bindings(vla: &Value, size_group: &SizeGroup) -> Vec<ListBox
                     row_grid.attach(&expl_label, 1, 0, 1, 1);
 
                     row.set_child(Some(&row_grid));
+                    row.set_vexpand(false);
                     rows.push(row);
                 }
                 // Ignore other JSON value types
@@ -116,35 +134,18 @@ fn main() -> glib::ExitCode {
             eprintln!("Clicked!");
         });
 
+        let welcome_box = Box::builder()
+            .orientation(Orientation::Vertical)
+            .spacing(12)
+            .vexpand(false)
+            .build();
+
+        welcome_box.append(&app_title);
+        welcome_box.append(&app_button);
+
         let system_keybindings: SystemKeybindings = fetch_all_data().unwrap();
 
         let size_group = SizeGroup::new(SizeGroupMode::Horizontal);
-
-        let pubb = system_keybindings.power_user_bindings.as_object().unwrap();
-
-        let boxes: Vec<ListBox> = pubb
-            .iter()
-            .map(|(kk, vv)| {
-                let pu_labels = make_labels_from_bindings(&vv, &size_group);
-
-                let list_box = ListBox::builder()
-                    .margin_top(16)
-                    .margin_bottom(16)
-                    .margin_start(24)
-                    .margin_end(24)
-                    .build();
-
-                let lll = Label::new(Some(format!("{}", kk).as_str()));
-                list_box.append(&lll);
-                pu_labels.iter().for_each(|l| list_box.append(l));
-                list_box
-            })
-            .collect();
-
-        let app_box = Box::builder()
-            .orientation(Orientation::Vertical)
-            .spacing(12)
-            .build();
 
         let sidebar_box = Box::builder()
             .orientation(Orientation::Vertical)
@@ -155,39 +156,91 @@ fn main() -> glib::ExitCode {
             .margin_end(24)
             .build();
 
-        sidebar_box.append(&Label::new(Some("SSS")));
+        let welcome_page_button = Button::with_label("SSS");
+        let power_user_page_button = Button::with_label("Power user");
 
-        app_box.append(&app_title);
-        app_box.append(&app_button);
-        boxes.iter().for_each(|b| app_box.append(b));
+        sidebar_box.append(&welcome_page_button);
+        sidebar_box.append(&power_user_page_button);
 
         let app_sidebar = NavigationPage::builder().child(&sidebar_box).build();
 
-        let power_user_navigation_page = NavigationPage::builder().child(&app_box).build();
+        let power_user_page = make_power_user_page(
+            system_keybindings.power_user_bindings.as_object().unwrap(),
+            &size_group,
+        );
 
-        let ansv = NavigationSplitView::builder()
+        let welcome_page = NavigationPage::builder().child(&welcome_box).build();
+
+        let navigation_split_view = NavigationSplitView::builder()
             .sidebar(&app_sidebar)
-            .content(&power_user_navigation_page)
+            .content(&welcome_page)
             .build();
 
-        let scrolled_window = ScrolledWindow::builder()
-            .hscrollbar_policy(PolicyType::Never) // Disable horizontal scrolling
-            .min_content_width(360)
-            .child(&ansv)
-            .build();
+        // welcome_page_button.connect_clicked(move |_| {
+        //     navigation_split_view.set_content(Some(&welcome_page));
+        // });
+
+        power_user_page_button.connect_clicked(move |_| {
+            &navigation_split_view.set_content(Some(&power_user_page));
+        });
 
         let window = adw::ApplicationWindow::builder()
             .application(app)
             .title("SSS Help")
             .default_width(350)
-            .default_height(70)
-            .content(&scrolled_window)
+            .default_height(200)
+            .content(&navigation_split_view)
             .build();
 
         window.present();
     });
 
     application.run()
+}
+
+fn make_power_user_page(
+    pubb: &serde_json::Map<String, Value>,
+    size_group: &SizeGroup,
+) -> NavigationPage {
+    let power_user_box = Box::builder()
+        .orientation(Orientation::Vertical)
+        .spacing(12)
+        .vexpand(false)
+        .build();
+
+    let boxes: Vec<ListBox> = pubb
+        .iter()
+        .map(|(kk, vv)| {
+            let pu_labels = make_labels_from_bindings(&vv, size_group);
+
+            let list_box = ListBox::builder()
+                .margin_top(16)
+                .margin_bottom(16)
+                .margin_start(24)
+                .margin_end(24)
+                .vexpand(false)
+                .build();
+
+            let lll = Label::new(Some(format!("{}", kk).as_str()));
+            list_box.append(&lll);
+            pu_labels.iter().for_each(|l| list_box.append(l));
+            list_box
+        })
+        .collect();
+
+    boxes.iter().for_each(|b| power_user_box.append(b));
+
+    let scrolled_window = ScrolledWindow::builder()
+        .hscrollbar_policy(PolicyType::Never) // Disable horizontal scrolling
+        .min_content_width(360)
+        .min_content_height(360)
+        .child(&power_user_box)
+        .build();
+
+    NavigationPage::builder()
+        .title("Power user session")
+        .child(&scrolled_window)
+        .build()
 }
 
 fn fetch_single_binding(dconf_key: &str) -> Result<Value, KeybindingError> {
