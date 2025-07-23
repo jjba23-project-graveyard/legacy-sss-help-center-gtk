@@ -74,15 +74,19 @@ fn make_labels_from_bindings(vla: &Value, size_group: &SizeGroup) -> Vec<ListBox
                 // If it's a string, it's a keybinding entry.
                 Value::String(s) => {
                     let row = ListBoxRow::new();
-                    let kb_label = Label::new(Some(&format!("<tt>{}</tt>", key)));
-                    kb_label.set_use_markup(true);
-                    kb_label.set_xalign(0.0);
+                    let kb_label = Label::builder()
+                        .label(format!("<tt>{}</tt>", key))
+                        .use_markup(true)
+                        .xalign(0.0)
+                        .build();
 
                     size_group.add_widget(&kb_label);
 
-                    let expl_label = Label::new(Some(s.as_str()));
-                    expl_label.set_wrap(true);
-                    expl_label.set_xalign(0.0);
+                    let expl_label = Label::builder()
+                        .label(s.as_str())
+                        .wrap(true)
+                        .xalign(0.0)
+                        .build();
 
                     let row_grid = gtk::Grid::builder().column_spacing(24).build();
 
@@ -123,11 +127,12 @@ fn main() -> glib::ExitCode {
             .map(|(kk, vv)| {
                 let pu_labels = make_labels_from_bindings(&vv, &size_group);
 
-                let list_box = ListBox::new();
-                list_box.set_margin_top(16);
-                list_box.set_margin_bottom(16);
-                list_box.set_margin_start(24);
-                list_box.set_margin_end(24);
+                let list_box = ListBox::builder()
+                    .margin_top(16)
+                    .margin_bottom(16)
+                    .margin_start(24)
+                    .margin_end(24)
+                    .build();
 
                 let lll = Label::new(Some(format!("{}", kk).as_str()));
                 list_box.append(&lll);
@@ -144,11 +149,12 @@ fn main() -> glib::ExitCode {
         let sidebar_box = Box::builder()
             .orientation(Orientation::Vertical)
             .spacing(12)
+            .margin_top(16)
+            .margin_bottom(16)
+            .margin_start(24)
+            .margin_end(24)
             .build();
-        sidebar_box.set_margin_top(16);
-        sidebar_box.set_margin_bottom(16);
-        sidebar_box.set_margin_start(24);
-        sidebar_box.set_margin_end(24);
+
         sidebar_box.append(&Label::new(Some("SSS")));
 
         app_box.append(&app_title);
