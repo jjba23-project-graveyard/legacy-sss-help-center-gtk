@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with sss-help.  If not, see <https://www.gnu.org/licenses/>.
 
-use adw::{HeaderBar, NavigationPage, NavigationSplitView};
+use adw::{NavigationPage, NavigationSplitView};
 use gtk::{
     glib, Align, Box, Button, Label, ListBox, Orientation, PolicyType, ScrolledWindow, SizeGroup, SizeGroupMode
 };
