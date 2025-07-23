@@ -17,7 +17,8 @@
 
 use adw::{NavigationPage, NavigationSplitView};
 use gtk::{
-    glib, Align, Box, Button, Label, ListBox, Orientation, PolicyType, ScrolledWindow, SizeGroup, SizeGroupMode
+    glib, Align, Box, Button, Label, ListBox, Orientation, PolicyType, ScrolledWindow, SizeGroup,
+    SizeGroupMode,
 };
 use gtk::{prelude::*, ListBoxRow};
 use serde_json::Value;
@@ -37,7 +38,10 @@ fn make_labels_from_bindings(vla: &Value, size_group: &SizeGroup) -> Vec<ListBox
                 // Create a title row and recurs to get its children.
                 Value::Object(_) => {
                     let title_row = ListBoxRow::new();
-                    let title_label = Label::builder().label(format!("--------- {} ---------", key)).use_markup(true).build();
+                    let title_label = Label::builder()
+                        .label(format!("--------- {} ---------", key))
+                        .use_markup(true)
+                        .build();
                     title_row.set_child(Some(&title_label));
 
                     rows.push(
@@ -120,7 +124,7 @@ fn main() -> glib::ExitCode {
             .margin_bottom(12)
             .margin_start(32)
             .margin_end(32)
-            .build();        
+            .build();
 
         welcome_box.append(&app_title);
         welcome_box.append(&app_button);
@@ -143,8 +147,8 @@ fn main() -> glib::ExitCode {
                 .label("You can be aware of all the code that is running on your machine, which puts free GNU systems among the most secure operating systems on Earth.")
                                 .wrap(true)
                 .build()
-        ];   
-        
+        ];
+
 
         sss_desc_labels.into_iter().for_each(|l| desc_box.append(&l));
                 welcome_box.append(&desc_box);
@@ -199,7 +203,7 @@ fn main() -> glib::ExitCode {
             .title("Supreme Sexp System (SSS) - Help")
             .default_width(350)
             .default_height(200)
-            .content(&navigation_split_view)            
+            .content(&navigation_split_view)
             .build();
 
         window.present();
@@ -252,6 +256,3 @@ fn make_power_user_page(
         .child(&scrolled_window)
         .build()
 }
-
-
-
