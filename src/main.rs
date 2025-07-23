@@ -163,11 +163,11 @@ fn main() -> glib::ExitCode {
 
         let app_sidebar = NavigationPage::builder().child(&sidebar_box).build();
 
-        let app_content = NavigationPage::builder().child(&app_box).build();
+        let power_user_navigation_page = NavigationPage::builder().child(&app_box).build();
 
         let ansv = NavigationSplitView::builder()
             .sidebar(&app_sidebar)
-            .content(&app_content)
+            .content(&power_user_navigation_page)
             .build();
 
         let scrolled_window = ScrolledWindow::builder()
