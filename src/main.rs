@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with sss-help.  If not, see <https://www.gnu.org/licenses/>.
 
+use std::process::Command;
+
 use adw::{NavigationPage, NavigationSplitView};
 use gtk::{
     glib, Align, Box, Button, Label, ListBox, Orientation, PolicyType, ScrolledWindow, SizeGroup,
@@ -41,6 +43,7 @@ fn make_labels_from_bindings(vla: &Value, size_group: &SizeGroup) -> Vec<ListBox
                     let title_label = Label::builder()
                         .label(format!("{}", key))
                         .use_markup(true)
+                        .css_classes(vec!["title-4"])
                         .build();
                     title_row.set_child(Some(&title_label));
                     rows.push(
@@ -58,6 +61,7 @@ fn make_labels_from_bindings(vla: &Value, size_group: &SizeGroup) -> Vec<ListBox
                         .label(format!("<tt>{}</tt>", key))
                         .use_markup(true)
                         .selectable(true)
+                        .css_classes(vec!["keycap"])
                         .xalign(0.0)
                         .margin_start(6)
                         .build();
@@ -96,10 +100,19 @@ fn main() -> glib::ExitCode {
 
     application.connect_activate(|app| {
 
-        let app_title = Label::builder().label("Supreme Sexp System (SSS) - Help").build();
-        let app_button = Button::with_label("Click me!");
-        app_button.connect_clicked(|_| {
-            eprintln!("Clicked!");
+        let app_title = Label::builder().label("Supreme Sexp System (SSS)")
+            .css_classes(vec!["title-2"])
+            .margin_top(16)
+            .margin_bottom(16)
+            .build();
+        let repo_button = Button::with_label("SSS repository @ Codeberg");
+        repo_button.connect_clicked(|_| {
+            let _ = Command::new("xdg-open" ).arg("https://codeberg.org/jjba23/sss").spawn();
+        });
+
+        let manual_button = Button::with_label("SSS manual @ jointhefreeworld");
+        manual_button.connect_clicked(|_| {
+            let _ = Command::new("xdg-open" ).arg("https://jointhefreeworld.org/manuals/sss/").spawn();
         });
 
         let welcome_box = Box::builder()
@@ -120,7 +133,13 @@ fn main() -> glib::ExitCode {
             .build();
 
         welcome_box.append(&app_title);
-        welcome_box.append(&app_button);
+
+        let button_box = Box::builder().orientation(Orientation::Horizontal).spacing(12).vexpand(false).valign(Align::Center).halign(Align::Center).build();
+
+                button_box.append(&repo_button);
+                button_box.append(&manual_button);
+                welcome_box.append(&button_box);
+
 
         let sss_desc_labels: Vec<Label> = vec![
                         Label::builder()
@@ -193,7 +212,7 @@ fn main() -> glib::ExitCode {
 
         let window = adw::ApplicationWindow::builder()
             .application(app)
-            .title("Supreme Sexp System (SSS) - Help")
+            .title("Supreme Sexp System (SSS)")
             .default_width(350)
             .default_height(200)
             .content(&navigation_split_view)
@@ -228,7 +247,10 @@ fn make_power_user_page(
                 .vexpand(false)
                 .build();
 
-            let lll = Label::new(Some(format!("{}", kk).as_str()));
+            let lll = Label::builder()
+                .label(format!("{}", kk).as_str())
+                .css_classes(vec!["title-2"])
+                .build();
             list_box.append(&lll);
             pu_labels.iter().for_each(|l| list_box.append(l));
             list_box
