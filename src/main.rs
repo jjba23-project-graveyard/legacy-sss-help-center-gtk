@@ -39,23 +39,16 @@ fn make_labels_from_bindings(vla: &Value, size_group: &SizeGroup) -> Vec<ListBox
                 Value::Object(_) => {
                     let title_row = ListBoxRow::new();
                     let title_label = Label::builder()
-                        .label(format!("--------- {} ---------", key))
+                        .label(format!("{}", key))
                         .use_markup(true)
                         .build();
                     title_row.set_child(Some(&title_label));
-
                     rows.push(
                         ListBoxRow::builder()
                             .child(&Label::builder().label("").build())
                             .build(),
                     );
-
                     rows.push(title_row);
-                    rows.push(
-                        ListBoxRow::builder()
-                            .child(&Label::builder().label("").build())
-                            .build(),
-                    );
                     rows.extend(make_labels_from_bindings(val, size_group)); // Recursive call
                 }
                 // If it's a string, it's a keybinding entry.
