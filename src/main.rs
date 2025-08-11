@@ -52,7 +52,7 @@ fn make_labels_from_bindings(vla: &Value, size_group: &SizeGroup) -> Vec<ListBox
                             .build(),
                     );
                     rows.push(title_row);
-                    rows.extend(make_labels_from_bindings(val, size_group)); // Recursive call
+                    rows.extend(make_labels_from_bindings(&val, size_group)); // Recursive call
                 }
                 // If it's a string, it's a keybinding entry.
                 Value::String(s) => {
@@ -105,12 +105,13 @@ fn main() -> glib::ExitCode {
             .margin_top(16)
             .margin_bottom(16)
             .build();
-        let repo_button = Button::with_label("SSS repository @ Codeberg");
+
+        let repo_button = Button::builder().label("SSS repository @ Codeberg").build();
         repo_button.connect_clicked(|_| {
             let _ = Command::new("xdg-open" ).arg("https://codeberg.org/jjba23/sss").spawn();
         });
 
-        let manual_button = Button::with_label("SSS manual @ jointhefreeworld");
+        let manual_button = Button::builder().label("SSS manual @ jointhefreeworld").build();
         manual_button.connect_clicked(|_| {
             let _ = Command::new("xdg-open" ).arg("https://jointhefreeworld.org/manuals/sss/").spawn();
         });
@@ -134,7 +135,8 @@ fn main() -> glib::ExitCode {
 
         welcome_box.append(&app_title);
 
-        let button_box = Box::builder().orientation(Orientation::Horizontal).spacing(12).vexpand(false).valign(Align::Center).halign(Align::Center).build();
+        let button_box = Box::builder()
+            .orientation(Orientation::Horizontal).spacing(12).vexpand(false).valign(Align::Center).halign(Align::Center).build();
 
                 button_box.append(&repo_button);
                 button_box.append(&manual_button);
@@ -144,11 +146,11 @@ fn main() -> glib::ExitCode {
         let sss_desc_labels: Vec<Label> = vec![
                         Label::builder()
                 .label("SSS (Supreme Sexp System) is a modern version of the Lisp machines of yore.")
-                                .wrap(true)
+                .wrap(true)
                 .build(),
             Label::builder()
                 .label("This is a custom GNU + Linux setup lets you customize everything endlessly, inspires creativity and problem-solving, and gives you a great user experience.")
-                                .wrap(true)
+                .wrap(true)
                 .build(),
 
             Label::builder()
@@ -157,19 +159,21 @@ fn main() -> glib::ExitCode {
                 .build(),
             Label::builder()
                 .label("You can be aware of all the code that is running on your machine, which puts free GNU systems among the most secure operating systems on Earth.")
-                                .wrap(true)
+                .wrap(true)
                 .build()
         ];
 
 
         sss_desc_labels.into_iter().for_each(|l| desc_box.append(&l));
-                welcome_box.append(&desc_box);
+        welcome_box.append(&desc_box);
 
         // ------------------
 
         let system_keybindings: SystemKeybindings = fetch_all_binding_data().unwrap();
 
-        let size_group = SizeGroup::new(SizeGroupMode::Horizontal);
+        let welcome_page_button = Button::builder().label("Welcome to SSS").build();
+        let universal_session_page_button = Button::builder().label("Universal session").build();
+        let power_user_page_button = Button::builder().label("Power user").build();
 
         let sidebar_box = Box::builder()
             .orientation(Orientation::Vertical)
@@ -180,17 +184,19 @@ fn main() -> glib::ExitCode {
             .margin_end(24)
             .build();
 
-        let welcome_page_button = Button::with_label("Welcome to SSS");
-        let power_user_page_button = Button::with_label("Power user");
 
         sidebar_box.append(&welcome_page_button);
+        sidebar_box.append(&universal_session_page_button);
         sidebar_box.append(&power_user_page_button);
 
         let app_sidebar = NavigationPage::builder().child(&sidebar_box).build();
 
-        let power_user_page = make_power_user_page(
-            system_keybindings.power_user_bindings.as_object().unwrap(),
-            &size_group,
+        let power_user_page = make_keybinding_page(
+            system_keybindings.power_user_bindings.as_object().unwrap()
+        );
+
+        let universal_page = make_keybinding_page(
+            system_keybindings.universal_session_bindings.as_object().unwrap()
         );
 
         let welcome_page = NavigationPage::builder().child(&welcome_box).title("Supreme Sexp System (SSS) - Help").build();
@@ -201,6 +207,7 @@ fn main() -> glib::ExitCode {
             .build();
         let navigation_split_view_clone = navigation_split_view.clone();
         let navigation_split_view_clone2 = navigation_split_view.clone();
+        let navigation_split_view_clone3 = navigation_split_view.clone();
 
         welcome_page_button.connect_clicked(move |_| {
             let _ = &navigation_split_view_clone2.set_content(Some(&welcome_page));
@@ -209,6 +216,10 @@ fn main() -> glib::ExitCode {
         power_user_page_button.connect_clicked(move |_| {
             let _ = &navigation_split_view_clone.set_content(Some(&power_user_page));
         });
+                universal_session_page_button.connect_clicked(move |_| {
+            let _ = &navigation_split_view_clone3.set_content(Some(&universal_page));
+        });
+
 
         let window = adw::ApplicationWindow::builder()
             .application(app)
@@ -224,10 +235,9 @@ fn main() -> glib::ExitCode {
     application.run()
 }
 
-fn make_power_user_page(
-    bindings: &serde_json::Map<String, Value>,
-    size_group: &SizeGroup,
-) -> NavigationPage {
+fn make_keybinding_page(bindings: &serde_json::Map<String, Value>) -> NavigationPage {
+    let size_group = SizeGroup::new(SizeGroupMode::Horizontal);
+
     let main_box = Box::builder()
         .orientation(Orientation::Vertical)
         .spacing(12)
@@ -237,7 +247,7 @@ fn make_power_user_page(
     let binding_group_boxes: Vec<ListBox> = bindings
         .iter()
         .map(|(kk, vv)| {
-            let pu_labels = make_labels_from_bindings(&vv, size_group);
+            let pu_labels = make_labels_from_bindings(&vv, &size_group);
 
             let list_box = ListBox::builder()
                 .margin_top(16)

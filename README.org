@@ -31,12 +31,12 @@ By using Libadwaita, we ensure the Help Center has a modern, polished, consisten
 
 ** Building the project
 
-   To build the SSS Help Center, you will need to have Rust, Cargo, certain GTK dependencies and GNU Make installed.
+To build the SSS Help Center, you will need to have Rust, Cargo, certain GTK dependencies and GNU Make installed.
 
-   You can do this and many ways, also with Nix or Guix, which we encourage
+ You can do this in many ways, also with Guix, which we encourage
 
    #+BEGIN_SRC shell
-   make nix-run
+   make run
    #+END_SRC
 
 *TODO* better packaging system and distribution via Guix
