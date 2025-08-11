@@ -17,12 +17,12 @@
 
 use std::process::Command;
 
-use adw::{NavigationPage, NavigationSplitView};
+use adw::NavigationPage;
+use gtk::{prelude::*, ListBoxRow};
 use gtk::{
-    glib, Align, Box, Button, Label, ListBox, Orientation, PolicyType, ScrolledWindow, SizeGroup,
+    Align, Box, Button, Label, ListBox, Orientation, PolicyType, ScrolledWindow, SizeGroup,
     SizeGroupMode,
 };
-use gtk::{prelude::*, ListBoxRow};
 use serde_json::Value;
 
 fn make_labels_from_bindings(vla: &Value, size_group: &SizeGroup) -> Vec<ListBoxRow> {
