@@ -39,7 +39,7 @@ To build the SSS Help Center, you will need to have Rust, Cargo, certain GTK dep
    make run
    #+END_SRC
 
-*TODO* better packaging system and distribution via Guix
+*TODO* upstream package to Guix
 
 ** How this works
 
