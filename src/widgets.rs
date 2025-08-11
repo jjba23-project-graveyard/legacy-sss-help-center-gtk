@@ -106,7 +106,13 @@ pub fn make_welcome_page() -> NavigationPage {
 
     welcome_box.append(&desc_box);
 
-    let sss_img = Image::from_file("./resources/img/sss.png");
+    let exe_path = std::env::current_exe().unwrap();
+    let bin_path = exe_path.parent().unwrap();
+    let store_path = bin_path.parent().unwrap();
+    let img_file_path = format!("{}/share/resources/img/sss.png", store_path.display());
+    println!("loading SSS image file: {}", img_file_path);
+
+    let sss_img = Image::builder().pixel_size(256).file(img_file_path).build();
     welcome_box.append(&sss_img);
 
     NavigationPage::builder()
