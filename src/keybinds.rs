@@ -64,7 +64,7 @@ fn parse_bindings(
     let mut buf = [0u8; 16];
     let decoded_bytes =
         base16ct::lower::decode(base16_encoded, &mut buf).map_err(KeybindingError::Base16)?;
-    let json_string = String::from_utf8(decoded_bytes).map_err(KeybindingError::Utf8)?;
+    let json_string = String::from_utf8(decoded_bytes.to_vec()).map_err(KeybindingError::Utf8)?;
     let parsed_json = serde_json::from_str(&json_string).map_err(KeybindingError::Json)?;
 
     Ok(parsed_json)
