@@ -23,7 +23,7 @@ use std::process::Command;
 pub enum KeybindingError {
     DconfCommand(std::io::Error),
     DconfFailed(String),
-    Base16(base16::DecodeError),
+    Base16(base16ct::Error),
     Utf8(std::string::FromUtf8Error),
     Json(serde_json::Error),
 }
@@ -61,7 +61,9 @@ fn parse_bindings(
     let base16_encoded = raw_stdout.trim().trim_matches('\'');
 
     // Decode from Base16, parse to UTF-8, then parse as JSON
-    let decoded_bytes = base16::decode(base16_encoded).map_err(KeybindingError::Base16)?;
+    let mut buf = [0u8; 16];
+    let decoded_bytes =
+        base16ct::lower::decode(base16_encoded, &mut buf).map_err(KeybindingError::Base16)?;
     let json_string = String::from_utf8(decoded_bytes).map_err(KeybindingError::Utf8)?;
     let parsed_json = serde_json::from_str(&json_string).map_err(KeybindingError::Json)?;
 
