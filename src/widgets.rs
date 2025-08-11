@@ -20,74 +20,10 @@ use std::process::Command;
 use adw::NavigationPage;
 use gtk::{prelude::*, ListBoxRow};
 use gtk::{
-    Align, Box, Button, Label, ListBox, Orientation, PolicyType, ScrolledWindow, SizeGroup,
+    Align, Box, Button, Image, Label, ListBox, Orientation, PolicyType, ScrolledWindow, SizeGroup,
     SizeGroupMode,
 };
 use serde_json::Value;
-
-fn make_labels_from_bindings(vla: &Value, size_group: &SizeGroup) -> Vec<ListBoxRow> {
-    vla.as_object()
-        .into_iter()
-        .flatten()
-        .flat_map(|(key, val)| {
-            let mut rows = Vec::new();
-            match val {
-                // If the value is an object, it's a category.
-                // Create a title row and recurs to get its children.
-                Value::Object(_) => {
-                    let title_row = ListBoxRow::new();
-                    let title_label = Label::builder()
-                        .label(format!("{}", key))
-                        .use_markup(true)
-                        .css_classes(vec!["title-4"])
-                        .build();
-                    title_row.set_child(Some(&title_label));
-                    rows.push(
-                        ListBoxRow::builder()
-                            .child(&Label::builder().label("").build())
-                            .build(),
-                    );
-                    rows.push(title_row);
-                    rows.extend(make_labels_from_bindings(&val, size_group)); // Recursive call
-                }
-                // If it's a string, it's a keybinding entry.
-                Value::String(s) => {
-                    let row = ListBoxRow::new();
-                    let kb_label = Label::builder()
-                        .label(format!("<tt>{}</tt>", key))
-                        .use_markup(true)
-                        .selectable(true)
-                        .css_classes(vec!["keycap"])
-                        .xalign(0.0)
-                        .margin_start(6)
-                        .build();
-
-                    size_group.add_widget(&kb_label);
-
-                    let expl_label = Label::builder()
-                        .label(s.as_str())
-                        .wrap(true)
-                        .xalign(0.0)
-                        .selectable(true)
-                        .margin_start(6)
-                        .build();
-
-                    let row_grid = gtk::Grid::builder().column_spacing(24).build();
-
-                    row_grid.attach(&kb_label, 0, 0, 1, 1);
-                    row_grid.attach(&expl_label, 1, 0, 1, 1);
-
-                    row.set_child(Some(&row_grid));
-                    row.set_vexpand(false);
-                    rows.push(row);
-                }
-                // Ignore other JSON value types
-                _ => {}
-            }
-            rows
-        })
-        .collect()
-}
 
 pub fn make_welcome_page() -> NavigationPage {
     let app_title = Label::builder()
@@ -167,7 +103,11 @@ pub fn make_welcome_page() -> NavigationPage {
     sss_desc_labels
         .into_iter()
         .for_each(|l| desc_box.append(&l));
+
     welcome_box.append(&desc_box);
+
+    let sss_img = Image::from_file("./resources/img/sss.png");
+    welcome_box.append(&sss_img);
 
     NavigationPage::builder()
         .child(&welcome_box)
@@ -220,4 +160,68 @@ pub fn make_keybinding_page(bindings: &serde_json::Map<String, Value>) -> Naviga
         .title("SSS - Supreme Sexp System")
         .child(&scrolled_window)
         .build()
+}
+
+fn make_labels_from_bindings(vla: &Value, size_group: &SizeGroup) -> Vec<ListBoxRow> {
+    vla.as_object()
+        .into_iter()
+        .flatten()
+        .flat_map(|(key, val)| {
+            let mut rows = Vec::new();
+            match val {
+                // If the value is an object, it's a category.
+                // Create a title row and recurs to get its children.
+                Value::Object(_) => {
+                    let title_row = ListBoxRow::new();
+                    let title_label = Label::builder()
+                        .label(format!("{}", key))
+                        .use_markup(true)
+                        .css_classes(vec!["title-4"])
+                        .build();
+                    title_row.set_child(Some(&title_label));
+                    rows.push(
+                        ListBoxRow::builder()
+                            .child(&Label::builder().label("").build())
+                            .build(),
+                    );
+                    rows.push(title_row);
+                    rows.extend(make_labels_from_bindings(&val, size_group)); // Recursive call
+                }
+                // If it's a string, it's a keybinding entry.
+                Value::String(s) => {
+                    let row = ListBoxRow::new();
+                    let kb_label = Label::builder()
+                        .label(format!("<tt>{}</tt>", key))
+                        .use_markup(true)
+                        .selectable(true)
+                        .css_classes(vec!["keycap"])
+                        .xalign(0.0)
+                        .margin_start(6)
+                        .build();
+
+                    size_group.add_widget(&kb_label);
+
+                    let expl_label = Label::builder()
+                        .label(s.as_str())
+                        .wrap(true)
+                        .xalign(0.0)
+                        .selectable(true)
+                        .margin_start(6)
+                        .build();
+
+                    let row_grid = gtk::Grid::builder().column_spacing(24).build();
+
+                    row_grid.attach(&kb_label, 0, 0, 1, 1);
+                    row_grid.attach(&expl_label, 1, 0, 1, 1);
+
+                    row.set_child(Some(&row_grid));
+                    row.set_vexpand(false);
+                    rows.push(row);
+                }
+                // Ignore other JSON value types
+                _ => {}
+            }
+            rows
+        })
+        .collect()
 }
