@@ -33,7 +33,7 @@ adw = { version = "0.6.0", package = "libadwaita", features = ["v1_5"] }
 gtk = { version = "0.8.0", package = "gtk4", features = ["v4_14"] }
 serde = "1.0.216"
 log = "0.4"
-base16ct = "0.2.0"
+base16ct = { version = "0.2.0", features = ["alloc"] }
 serde_json = "1.0.134"
 
 [profile.release]
