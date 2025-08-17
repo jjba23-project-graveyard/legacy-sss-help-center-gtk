@@ -25,7 +25,14 @@ pub mod keybinds;
 use crate::widgets::{make_keybinding_page, make_welcome_page};
 pub mod widgets;
 
+use gettextrs::*;
+
 fn main() -> glib::ExitCode {
+    let _ = bindtextdomain("sss-help-center", "./resources/locale");
+    let _ = bind_textdomain_codeset("sss-help-center", "UTF-8");
+    let _ = textdomain("sss-help-center");
+    // let _ = setlocale(LocaleCategory::LcMessages, "en_US.UTF-8");
+
     let application = adw::Application::builder()
         .application_id("sss.Help")
         .build();

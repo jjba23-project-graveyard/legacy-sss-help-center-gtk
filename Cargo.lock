@@ -226,9 +226,9 @@ dependencies = [
 
 [[package]]
 name = "gettext-sys"
-version = "0.22.5"
+version = "0.21.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bb45773f5b8945f12aecd04558f545964f943dacda1b1155b3d738f5469ef661"
+checksum = "f7b8797f28f2dabfbe2caadb6db4f7fd739e251b5ede0a2ba49e506071edcf67"
 dependencies = [
  "cc",
  "temp-dir",
@@ -755,6 +755,7 @@ version = "0.0.1"
 dependencies = [
  "base16ct",
  "gettext-rs",
+ "gettext-sys",
  "gtk4",
  "libadwaita",
  "log",

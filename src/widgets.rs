@@ -18,6 +18,7 @@
 use std::process::Command;
 
 use adw::NavigationPage;
+use gettextrs::*;
 use gtk::{prelude::*, ListBoxRow};
 use gtk::{
     Align, Box, Button, Image, Label, ListBox, Orientation, PolicyType, ScrolledWindow, SizeGroup,
@@ -82,7 +83,7 @@ pub fn make_welcome_page() -> NavigationPage {
 
     let sss_desc_labels: Vec<Label> = vec![
                         Label::builder()
-                .label("SSS (Supreme Sexp System) is a modern version of the Lisp machines of yore.")
+                .label(gettext("SSS (Supreme Sexp System) is a modern version of the Lisp machines of yore."))
                 .wrap(true)
                 .build(),
             Label::builder()
