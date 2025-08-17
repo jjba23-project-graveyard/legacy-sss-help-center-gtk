@@ -35,7 +35,15 @@ serde = "1.0.216"
 log = "0.4"
 base16ct = { version = "0.2.0", features = ["alloc"] }
 serde_json = "1.0.134"
+gettext-sys = { version = "0.21.4", features = ["gettext-system"] }
+gettext-rs = { version = "0.7.2", features = ["gettext-system"] }
 
 [profile.release]
 codegen-units = 1
 lto = true
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
