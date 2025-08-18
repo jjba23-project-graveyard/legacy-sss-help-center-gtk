@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with sss-help.  If not, see <https://www.gnu.org/licenses/>.
 
-use adw::{NavigationPage, NavigationSplitView};
+use adw::{NavigationPage, NavigationSplitView, StatusPage, ToolbarView};
 use gtk::prelude::*;
 use gtk::{glib, Box, Button, Orientation};
 
@@ -65,6 +65,7 @@ fn main() -> glib::ExitCode {
         let power_user_page_button = Button::builder().label("Power user").build();
 
         let sidebar_box = Box::builder()
+            .css_classes(vec!["navigation-sidebar"])
             .orientation(Orientation::Vertical)
             .spacing(12)
             .margin_top(16)
@@ -77,7 +78,10 @@ fn main() -> glib::ExitCode {
         sidebar_box.append(&universal_session_page_button);
         sidebar_box.append(&power_user_page_button);
 
-        let app_sidebar = NavigationPage::builder().child(&sidebar_box).build();
+        let status_page = StatusPage::builder().child(&sidebar_box).build();
+        let tv = ToolbarView::builder().content(&status_page).build();
+
+        let app_sidebar = NavigationPage::builder().child(&tv).build();
 
         let navigation_split_view = NavigationSplitView::builder()
             .sidebar(&app_sidebar)
@@ -99,7 +103,7 @@ fn main() -> glib::ExitCode {
             let _ = &navigation_split_view_clone3.set_content(Some(&universal_page));
         });
 
-        let window = adw::ApplicationWindow::builder()
+        let window = adw::Window::builder()
             .application(app)
             .title("Supreme Sexp System (SSS)")
             .default_width(350)
