@@ -28,7 +28,12 @@ pub mod widgets;
 use gettextrs::*;
 
 fn main() -> glib::ExitCode {
-    let _ = bindtextdomain("sss-help-center", "./resources/locale");
+    let exe_path = std::env::current_exe().unwrap();
+    let bin_path = exe_path.parent().unwrap();
+    let store_path = bin_path.parent().unwrap();
+    let locale_path = format!("{}/share/resources/locale", store_path.display());
+
+    let _ = bindtextdomain("sss-help-center", locale_path);
     let _ = bind_textdomain_codeset("sss-help-center", "UTF-8");
     let _ = textdomain("sss-help-center");
     // let _ = setlocale(LocaleCategory::LcMessages, "en_US.UTF-8");
