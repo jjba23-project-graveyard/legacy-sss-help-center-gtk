@@ -29,8 +29,8 @@ keywords = []
 categories = []
 
 [dependencies]
-adw = { version = "0.6.0", package = "libadwaita", features = ["v1_5"] }
-gtk = { version = "0.8.0", package = "gtk4", features = ["v4_14"] }
+adw = { version = "0.7.2", package = "libadwaita", features = ["v1_5"] }
+gtk = { version = "0.9.6", package = "gtk4", features = ["v4_14"] }
 serde = "1.0.216"
 log = "0.4"
 base16ct = { version = "0.2.0", features = ["alloc"] }
