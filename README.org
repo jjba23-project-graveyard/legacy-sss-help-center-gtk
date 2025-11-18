@@ -1,7 +1,9 @@
-#+TITLE: sss-help-center-gtk
-#+AUTHOR: Josep Bigorra
+#+title: sss-help-center-gtk
+#+author: Josep Bigorra
 #+email: jjbigorra@gmail.com
-#+DATE: <2025-07-17 Thu>
+#+date: <2025-07-17 Thu>
+
+[[https://jointhefreeworld.org/ggg/dist/rust-185+.svg]] [[https://jointhefreeworld.org/ggg/dist/cargo.svg]] [[https://jointhefreeworld.org/ggg/dist/license-gpl3+.svg]]    [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]]
 
 Welcome to the SSS Help Center GTK, the user assistance and documentation application within the  [[https://codeberg.org/jjba23/sss][Supreme Sexp System]]. This project is a modern, robust, and user-friendly help and keybinding view client designed from the ground up to provide a seamless experience.
 
