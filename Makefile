@@ -133,4 +133,4 @@ guix-build:
 	guix build -f guix.scm -d
 
 guix-install:
-	sudo cp "$$(guix build -f guix.scm -q)/bin/inkaartbrenger" ~/.local/bin/
+	sudo cp "$$(guix build -f guix.scm -q)/bin/sss-help" ~/.local/bin/
