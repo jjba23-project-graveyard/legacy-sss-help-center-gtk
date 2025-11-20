@@ -36,7 +36,7 @@ If you want to hack on the project with Guix, it's useful to have an ~.envrc~ wi
 
 A quick way to install locally can be:
 #+begin_src shell
-sudo cp "$(guix build -f guix.scm -q)/bin/sss-help-center-gtk" ~/.local/bin/
+sudo cp "$(guix build -f guix.scm -q)/bin/sss-help" ~/.local/bin/
 # or `make guix-install`
 #+end_src
 
