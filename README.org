@@ -7,17 +7,39 @@
 
 Welcome to the SSS Help Center GTK, the user assistance and documentation application within the  [[https://codeberg.org/jjba23/sss][Supreme Sexp System]]. This project is a modern, robust, and user-friendly help and keybinding view client designed from the ground up to provide a seamless experience.
 
-The core of this application is built using Rust, a language known for its performance and safety, ensuring that the help center is both fast and reliable. The user interface is crafted with the latest GNOME desktop technologies, including GTK 4 and LibAdwaita, to offer a modern, clean, adaptive, and intuitive experience that feels right at home on the SSS desktop.
+The core of this application is built using Rust, a language known for its performance and safety, ensuring that the help center is fast, reliable, and using the latest GNOME desktop technologies, including GTK 4 and LibAdwaita, to offer a modern, clean, adaptive, and intuitive experience.
 
---------------------------------
+A ~Makefile~ is provided with the project, and it contains some common tasks and utilities, and can be useful to learn how to use this project.
 
-* Backend and Language: The Power of Rust
+** Install with Cargo
 
-The decision to use Rust for the development of the SSS Help Center is a strategic one. Rust allows us to build a highly performant and secure application.
+If you have the source code on your machine and are inside the project directory (where the Cargo.toml file is):
 
-The language's strong type system and ownership model eliminate entire classes of common bugs at compile time, leading to a more stable and maintainable codebase.
+#+begin_src shell
+cargo install --path .
+#+end_src
 
-Furthermore, Rust's modern tooling and rich ecosystem, including excellent bindings to GTK and other system components make the development process efficient and enjoyable.
+It installs binaries by default to ~~/.cargo/bin/~ so make sure that directory is in your ~$PATH~
+
+You can install directly from a remote Git URL without manually cloning it first:
+
+#+begin_src shell
+cargo install --git https://codeberg.org/jjba23/inkaartbrenger
+#+end_src
+
+
+** Install with Guix
+
+The project contains a ~manifest.scm~ and a ~guix.scm~ with complete Guix integration.
+
+If you want to hack on the project with Guix, it's useful to have an ~.envrc~ with either ~use guix~.
+
+A quick way to install locally can be:
+#+begin_src shell
+sudo cp "$(guix build -f guix.scm -q)/bin/sss-help-center-gtk" ~/.local/bin/
+# or `make guix-install`
+#+end_src
+
 
 --------------------------------
 
@@ -29,6 +51,16 @@ By using Libadwaita, we ensure the Help Center has a modern, polished, consisten
 
 --------------------------------
 
+* The Power of Rust
+
+The decision to use Rust for the development of the SSS Help Center is a strategic one. Rust allows us to build a highly performant and secure application.
+
+The language's strong type system and ownership model eliminate entire classes of common bugs at compile time, leading to a more stable and maintainable codebase.
+
+Furthermore, Rust's modern tooling and rich ecosystem, including excellent bindings to GTK and other system components make the development process efficient and enjoyable.
+
+--------------------------------
+
 * Getting Started
 
 ** Building the project
@@ -37,9 +69,9 @@ To build the SSS Help Center, you will need to have Rust, Cargo, certain GTK dep
 
  You can do this in many ways, also with Guix, which we encourage
 
-   #+BEGIN_SRC shell
+#+BEGIN_SRC shell
    make run
-   #+END_SRC
+#+END_SRC
 
 *TODO* upstream package to Guix
 

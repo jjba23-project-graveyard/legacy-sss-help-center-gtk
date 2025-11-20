@@ -128,3 +128,9 @@ init-i18n-nl:
 	$(call sss-help-center-msginit,"nl_NL")
 merge-i18n-nl:
 	$(call sss-help-center-merge,"nl_NL")
+
+guix-build:
+	guix build -f guix.scm -d
+
+guix-install:
+	sudo cp "$$(guix build -f guix.scm -q)/bin/inkaartbrenger" ~/.local/bin/
