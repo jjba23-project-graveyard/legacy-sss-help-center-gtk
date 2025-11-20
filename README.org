@@ -24,7 +24,7 @@ It installs binaries by default to ~~/.cargo/bin/~ so make sure that directory i
 You can install directly from a remote Git URL without manually cloning it first:
 
 #+begin_src shell
-cargo install --git https://codeberg.org/jjba23/inkaartbrenger
+cargo install --git https://codeberg.org/jjba23/sss-help-center-gtk
 #+end_src
 
 
