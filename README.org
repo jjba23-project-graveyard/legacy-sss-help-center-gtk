@@ -11,6 +11,8 @@ The core of this application is built using Rust, a language known for its perfo
 
 A ~Makefile~ is provided with the project, and it contains some common tasks and utilities, and can be useful to learn how to use this project.
 
+If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
+
 ** Install with Cargo
 
 If you have the source code on your machine and are inside the project directory (where the Cargo.toml file is):
